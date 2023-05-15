@@ -137,10 +137,12 @@ function cgb_render_daveblock($attributes)
 		return 'No posts';
 	}
 
+
 	$output = '<h2 class="my-custom-block-title">' . esc_html($attributes['title']) . '</h2>';
 
 	foreach ($posts as $post) {
-		$output .= '<p>' . get_the_title($post) . ' - ' . get_the_excerpt($post) . '</p>';
+		$customFieldValue = get_field('text', $post->ID);
+		$output .= '<p>' . get_the_title($post) . ' - ' . get_the_excerpt($post) . ' - Custom Field Value: ' . $customFieldValue . '</p>';
 	}
 
 	return $output;

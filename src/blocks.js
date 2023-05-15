@@ -10,4 +10,4 @@
  */
 
 import "./block/block.js";
-import "./test/test.js";
+import "./query_karriere/query_karriere.js";
