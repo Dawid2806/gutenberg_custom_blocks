@@ -1,5 +1,3 @@
-import "./editor.scss";
-import "./style.scss";
 const { SelectControl } = wp.components;
 const { useSelect } = wp.data;
 
@@ -8,8 +6,8 @@ const { registerBlockType } = wp.blocks;
 const { TextControl, PanelBody, RangeControl } = wp.components;
 
 const { InspectorControls } = wp.blockEditor;
-registerBlockType("cgb/daveblock", {
-	title: "Query Karriere",
+registerBlockType("cgb/querynews", {
+	title: "Query News",
 	icon: "smiley",
 	category: "common",
 	attributes: {
@@ -24,25 +22,24 @@ registerBlockType("cgb/daveblock", {
 		},
 		postsToShow: {
 			type: "number",
-			default: 5, // domyślna wartość
+			default: 5, // default value
 		},
 		order: {
 			type: "string",
-			default: "desc", // domyślna wartość
-		},
-		firstContent: {
-			type: "string",
-			source: "meta",
-			meta: "first_content",
+			default: "desc", // default value
 		},
 	},
 	edit: (props) => {
 		const {
-			attributes: { postType, title, firstContent, postsToShow, order },
+			attributes: { postType, title, postsToShow, order },
 			setAttributes,
 		} = props;
 
-		const postTypes = useSelect((select) => select("core").getPostTypes());
+		const postTypes = useSelect((select) => select("core").getPostTypes(), []);
+
+		const postOptions = postTypes
+			? postTypes.map((type) => ({ label: type.name, value: type.slug }))
+			: [];
 
 		const posts = useSelect((select) =>
 			select("core").getEntityRecords("postType", postType, {
@@ -51,20 +48,16 @@ registerBlockType("cgb/daveblock", {
 			})
 		);
 
-		const postsQuery = useSelect((select) =>
-			select("core").getEntityRecords("postType", postType, {
-				per_page: postsToShow,
-				order: order,
-			})
-		);
-		const postOptions = postTypes
-			? postTypes.map((type) => ({ label: type.name, value: type.slug }))
-			: [];
-
 		return (
 			<div>
 				<InspectorControls>
 					<PanelBody title="Post Settings">
+						<SelectControl
+							label="Post Type"
+							value={postType}
+							options={postOptions}
+							onChange={(value) => setAttributes({ postType: value })}
+						/>
 						<RangeControl
 							label="Number of posts"
 							value={postsToShow}
@@ -86,19 +79,13 @@ registerBlockType("cgb/daveblock", {
 				<h3 className="my-custom-block-title">{title}</h3>
 				{posts &&
 					posts.map((post) => (
-						<p key={post.id}>
+						<div key={post.id}>
 							{post.title && post.title.rendered}
 							{post.excerpt && post.excerpt.rendered}
-						</p>
+						</div>
 					))}
 			</div>
 		);
 	},
-	save: (props) => {
-		const {
-			attributes: { title, firstContent },
-		} = props;
-
-		return null;
-	},
+	save: () => null,
 });

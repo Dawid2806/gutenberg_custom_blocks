@@ -9,5 +9,5 @@
  * Webpack is compiling as the input file.
  */
 
-import "./block/block.js";
 import "./query_karriere/query_karriere.js";
+import "./query_news/query_news.js";

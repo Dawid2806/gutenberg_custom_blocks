@@ -119,30 +119,40 @@ function render_my_block($attributes, $content)
 function register_my_block()
 {
 	if (function_exists('register_block_type')) {
-		register_block_type('test/test', array(
+		register_block_type('query_karriere/query_karriere.js', array(
 			'render_callback' => 'render_my_block',
 		));
 	}
 }
 
 add_action('init', 'register_my_block');
+
+// Query Karriere init
+
+
 function cgb_render_daveblock($attributes)
 {
+	$postType = isset($attributes['postType']) ? $attributes['postType'] : 'post';
+	$postsToShow = isset($attributes['postsToShow']) ? $attributes['postsToShow'] : -1;
+	$order = isset($attributes['order']) ? $attributes['order'] : 'DESC';
+
 	$posts = get_posts(array(
-		'post_type' => $attributes['postType'],
-		'numberposts' => -1,
+		'post_type' => $postType,
+		'numberposts' => $postsToShow,
+		'order' => $order,
 	));
 
 	if (count($posts) === 0) {
 		return 'No posts';
 	}
 
-
-	$output = '<h2 class="my-custom-block-title">' . esc_html($attributes['title']) . '</h2>';
+	$title = isset($attributes['title']) ? $attributes['title'] : '';
+	$output = '';
 
 	foreach ($posts as $post) {
-		$customFieldValue = get_field('text', $post->ID);
-		$output .= '<p>' . get_the_title($post) . ' - ' . get_the_excerpt($post) . ' - Custom Field Value: ' . $customFieldValue . '</p>';
+		$customFieldValue = get_field('standort', $post->ID);
+		$permalink = get_permalink($post->ID); // Pobieranie permalinku
+		$output .= '<div class="karriere_item"><span>/</span><div><a href="' . $permalink . '"><h3>' . get_the_title($post) . '</h3></a>' . '<p>' . $customFieldValue . '<p>' . '</div></div>'; // Dodanie linku do tytułu
 	}
 
 	return $output;
@@ -150,4 +160,54 @@ function cgb_render_daveblock($attributes)
 
 register_block_type('cgb/daveblock', array(
 	'render_callback' => 'cgb_render_daveblock',
+));
+
+
+
+// Query news init
+
+function cgb_render_query_news($attributes)
+{
+	$postType = isset($attributes['postType']) ? $attributes['postType'] : 'post';
+	$postsToShow = isset($attributes['postsToShow']) ? $attributes['postsToShow'] : -1;
+	$order = isset($attributes['order']) ? $attributes['order'] : 'DESC';
+
+	$posts = get_posts(array(
+		'post_type' => $postType,
+		'numberposts' => $postsToShow,
+		'order' => $order,
+	));
+
+	if (count($posts) === 0) {
+		return 'No posts';
+	}
+
+	$title = isset($attributes['title']) ? $attributes['title'] : '';
+	$output = '';
+
+	foreach ($posts as $post) {
+		$permalink = get_permalink($post->ID);
+		$excerpt = get_the_excerpt($post->ID);
+		$thumbnail = get_the_post_thumbnail_url($post->ID);
+		$date = get_the_date('', $post->ID);
+		$output .= '<div class="post-container">';
+		if ($thumbnail) {
+			$output .= '<div class="post-image"><img src="' . $thumbnail . '" /></div>';
+		}
+		$output .= '<div class="post-content">';
+		$output .= '<span class="post-date">' . $date . '</span>';
+		$output .= '<h4>' . get_the_title($post) . '</h4>';
+		if ($excerpt) {
+			$output .= '<p>' . substr($excerpt, 0, 200) . '</p>';
+		}
+		$output .= '<a href="' . $permalink . '">Read More</a>';
+		$output .= '</div>';
+		$output .= '</div>';
+	}
+
+	return $output;
+}
+
+register_block_type('cgb/querynews', array(
+	'render_callback' => 'cgb_render_query_news',
 ));
