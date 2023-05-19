@@ -151,7 +151,7 @@ function cgb_render_daveblock($attributes)
 
 	foreach ($posts as $post) {
 		$customFieldValue = get_field('standort', $post->ID);
-		$permalink = get_permalink($post->ID); // Pobieranie permalinku
+		$permalink = get_permalink($post->ID);
 		$output .= '<div class="karriere_item"><span>/</span><div><a href="' . $permalink . '"><h3>' . get_the_title($post) . '</h3></a>' . '<p>' . $customFieldValue . '<p>' . '</div></div>'; // Dodanie linku do tytułu
 	}
 
@@ -187,9 +187,11 @@ function cgb_render_query_news($attributes)
 
 	foreach ($posts as $post) {
 		$permalink = get_permalink($post->ID);
-		$excerpt = get_the_excerpt($post->ID);
+		$content = apply_filters('the_content', get_the_content(null, false, $post->ID));
+		$content = mb_substr(strip_tags($content), 0, 250) . '...';
+
 		$thumbnail = get_the_post_thumbnail_url($post->ID);
-		$date = get_the_date('', $post->ID);
+		$date = get_the_date('d.m.Y', $post->ID);
 		$output .= '<div class="post-container">';
 		if ($thumbnail) {
 			$output .= '<div class="post-image"><img src="' . $thumbnail . '" /></div>';
@@ -197,10 +199,10 @@ function cgb_render_query_news($attributes)
 		$output .= '<div class="post-content">';
 		$output .= '<span class="post-date">' . $date . '</span>';
 		$output .= '<h4>' . get_the_title($post) . '</h4>';
-		if ($excerpt) {
-			$output .= '<p>' . substr($excerpt, 0, 200) . '</p>';
+		if ($content) {
+			$output .= '<div class="post-fullcontent">' . $content . '</div>';
 		}
-		$output .= '<a href="' . $permalink . '">Read More</a>';
+		$output .= '<a href="' . $permalink . '">weiterlesen</a>';
 		$output .= '</div>';
 		$output .= '</div>';
 	}
@@ -210,4 +212,69 @@ function cgb_render_query_news($attributes)
 
 register_block_type('cgb/querynews', array(
 	'render_callback' => 'cgb_render_query_news',
+));
+
+
+function cgb_render_portfolio_block($attributes)
+{
+	$postType = isset($attributes['postType']) ? $attributes['postType'] : 'portfolio';
+	$postsToShow = isset($attributes['postsToShow']) ? $attributes['postsToShow'] : -1;
+	$order = isset($attributes['order']) ? $attributes['order'] : 'DESC';
+
+	$posts = get_posts(array(
+		'post_type' => $postType,
+		'numberposts' => $postsToShow,
+		'order' => $order,
+	));
+
+	if (count($posts) === 0) {
+		return 'No portfolio items';
+	}
+
+	$output = '<div class="portfolio">';
+	$first_post = array_shift($posts);
+	$permalink = get_permalink($first_post->ID);
+	$thumbnail = get_the_post_thumbnail_url($first_post->ID);
+	$title = get_the_title($first_post);
+
+	$output .= '<div class="first-post">';
+	$output .= '<a  href="' . $permalink . '">';
+	$output .= '<img src="' . $thumbnail . '" alt="' . $title . '">';
+	$output .= '<p>' . $title . '</p>';
+	$output .= '</a>';
+	$output .= '</div>'; // Close the first post div
+
+	$output .= '<div class="remaining-posts">'; // Start a new div for the remaining posts
+
+	foreach ($posts as $post) {
+		$permalink = '/einzelmaschinen//#' . sanitize_title(get_the_title($post));
+		$thumbnail = get_the_post_thumbnail_url($post->ID);
+		$title = get_the_title($post);
+
+		$output .= '<div class="column-item">';
+		$output .= '<a href="' . $permalink . '">';
+		$output .= '<img src="' . $thumbnail . '" alt="' . $title . '">';
+		$output .= '<p>' . $title . '</p>';
+		$output .= '</a>';
+		$output .= '</div>';
+	}
+
+	$output .= '</div>'; // Close the div for the remaining posts
+	$output .= '</div>'; // Close the portfolio
+
+	return $output;
+}
+
+register_block_type('cgb/portfolio', array(
+	'attributes'      => array(
+		'postsToShow' => array(
+			'type'    => 'number',
+			'default' => -1,
+		),
+		'order'      => array(
+			'type'    => 'string',
+			'default' => 'DESC',
+		),
+	),
+	'render_callback' => 'cgb_render_portfolio_block',
 ));
