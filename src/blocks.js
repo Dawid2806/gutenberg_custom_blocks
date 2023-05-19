@@ -11,3 +11,6 @@
 
 import "./query_karriere/query_karriere.js";
 import "./query_news/query_news.js";
+import "./query_portfolio/query_portfolio.js";
+import "./contentblock/contentblock.js";
+import "./acordeon/acordeon.js";

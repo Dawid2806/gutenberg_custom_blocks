@@ -78,12 +78,23 @@ registerBlockType("cgb/querynews", {
 				</InspectorControls>
 				<h3 className="my-custom-block-title">{title}</h3>
 				{posts &&
-					posts.map((post) => (
-						<div key={post.id}>
-							{post.title && post.title.rendered}
-							{post.excerpt && post.excerpt.rendered}
-						</div>
-					))}
+					posts.map((post) => {
+						// Convert the date string into a JS Date object.
+						const dateObject = new Date(post.date);
+
+						// Format the date.
+						const formattedDate = `${dateObject.getDate()}.${
+							dateObject.getMonth() + 1
+						}.${dateObject.getFullYear()}`;
+
+						return (
+							<div key={post.id}>
+								{post.title && post.title.rendered}
+								<p>{formattedDate}</p>
+								{post.excerpt && post.excerpt.rendered}
+							</div>
+						);
+					})}
 			</div>
 		);
 	},
