@@ -1,0 +1,70 @@
+.categories{
+    display: flex;
+    flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    padding: 2rem;
+    gap: 2rem;
+
+    h2{
+        font-family: "DDC Hardware";
+        margin: 2rem 0;
+    }
+    
+}
+.category{
+    scroll-behavior: smooth;
+}
+.maschinen{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: 1fr;
+    
+}
+.maschine{
+    margin:1rem 0;
+
+}
+
+.maschine a{
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
+    max-width: 350px;
+    width: 100%;
+    text-decoration: none;
+
+}
+.maschine a p {
+    background:  #EAF2FB;
+    padding: 0.5rem 1rem;
+    color: black;
+}
+.maschine:hover a p{
+    background:#002C59 ;
+    color: white;
+}
+
+.maschine img{
+    width: 100%;
+    height: 100%;
+    max-width: 350px;
+    max-height: 270px;
+   
+}
+@media (min-width: 768px){
+    .maschinen{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        
+    }
+}
+@media (min-width: 1024px){
+    .maschinen{
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        
+    }
+}

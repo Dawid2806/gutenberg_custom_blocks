@@ -1,34 +1,3 @@
-/**
- * #.# Common SCSS
- *
- * Can include things like variables and mixins
- * that are used across the project.
-*/
-.wp-block-cgb-daveblock {
-  background: black;
-  color: white; }
-
-.my-custom-block-title {
-  background: black;
-  color: white; }
-/**
- * #.# Common SCSS
- *
- * Can include things like variables and mixins
- * that are used across the project.
-*/
-.image-left .image img,
-.image-right .image img {
-  width: 500px;
-  height: 500px;
-  margin: auto; }
-/**
- * #.# Common SCSS
- *
- * Can include things like variables and mixins
- * that are used across the project.
-*/
-.accordion-content {
-  height: 200px;
-  overflow: hidden;
-  max-height: 100%; }
+.wp-block-cgb-daveblock{background:black;color:white}.my-custom-block-title{background:black;color:white}
+.image-left .image img,.image-right .image img{width:500px;height:500px;margin:auto}
+.accordion-content{height:200px;overflow:hidden;max-height:100%}

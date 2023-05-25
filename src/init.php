@@ -278,3 +278,117 @@ register_block_type('cgb/portfolio', array(
 	),
 	'render_callback' => 'cgb_render_portfolio_block',
 ));
+function customize_rest_api_response($response, $post, $request)
+{
+	if ($post->post_type !== 'einzelmaschine') {
+		return $response;
+	}
+
+	$data = $response->get_data();
+
+	if (isset($data['acf']['gallery']) && is_array($data['acf']['gallery'])) {
+		foreach ($data['acf']['gallery'] as $index => $attachment_id) {
+			$image_src = wp_get_attachment_image_src($attachment_id, 'full');
+
+			if ($image_src) {
+				$data['acf']['gallery'][$index] = [
+					'id' => $attachment_id,
+					'url' => $image_src[0],
+					'width' => $image_src[1],
+					'height' => $image_src[2],
+				];
+			}
+		}
+
+		$response->set_data($data);
+	}
+
+	return $response;
+}
+
+add_filter('rest_prepare_einzelmaschine', 'customize_rest_api_response', 10, 3);
+function cgb_render_einzelmaschinen_block($attributes)
+{
+	$postsToShow = isset($attributes['postsToShow']) ? $attributes['postsToShow'] : -1;
+	$order = isset($attributes['order']) ? $attributes['order'] : 'DESC';
+
+	$slug_order = array('sagen-und-sageanlagen', 'wasserstrahlmaschinen', 'bearbeitungszentren', 'kanten-flaschenschleifen', 'innerbetriebliche-logistik', 'sondermaschinen');
+
+	$categories = get_categories();
+
+	usort($categories, function ($a, $b) use ($slug_order) {
+		$a_order = array_search($a->slug, $slug_order);
+		$b_order = array_search($b->slug, $slug_order);
+
+		if ($a_order === false && $b_order === false) {
+			return 0;
+		} else if ($a_order === false) {
+			return 1;
+		} else if ($b_order === false) {
+			return -1;
+		} else {
+			return $a_order - $b_order;
+		}
+	});
+
+	$output = '<div class="categories">';
+	foreach ($categories as $category) {
+		if ($category->slug != 'uncategorized') {
+			$output .= '<section id="' . $category->slug . '" class="category">';
+			$output .= '<h2>' . $category->name . '</h2>';
+			$maschinen = get_posts(array(
+				'post_type' => 'Einzelmaschine',
+				'numberposts' => $postsToShow,
+				'order' => $order,
+				'category' => $category->term_id,
+			));
+
+			if (!$maschinen) {
+				error_log('No einzelmaschines found for category: ' . $category->name);
+			} else {
+				$output .= '<div class="maschinen">';
+				foreach ($maschinen as $maschine) {
+					$title = get_field('title', $maschine->ID);
+					$unter_title_description = get_field('unter_title_description', $maschine->ID);
+					$gallery = get_field('gallery', $maschine->ID);
+					if (!$title || !$gallery) {
+						error_log('Missing ACF field on post ID: ' . $maschine->ID);
+					} else {
+						$output .= '<div class="maschine">';
+						$output .= '<a href="' . get_permalink($maschine->ID) . '">'; // Dodane
+						$output .= '<p>' . $title  . '<span> -' . $unter_title_description . '</span></p>';
+						if ($gallery && count($gallery) > 0) {
+							$output .= '<img src="' . $gallery[0]['url'] . '" alt="' . $title . '">';
+						}
+						$output .= '</a>'; // Dodane
+						$output .= '</div>'; // Close the maschine div
+					}
+				}
+				$output .= '</div>'; // Close the maschinen div
+			}
+			$output .= '</section>'; // Close the category div
+		}
+	}
+	$output .= '</div>'; // Close the categories div
+
+	return $output;
+}
+
+// Teraz zarejestruj ten blok do użycia w edytorze Gutenberg
+function cgb_register_einzelmaschinen_block()
+{
+	register_block_type('cgb/einzelmaschinenblock', array(
+		'attributes' => array(
+			'postsToShow' => array(
+				'type' => 'number',
+				'default' => 5,
+			),
+			'order' => array(
+				'type' => 'string',
+				'default' => 'desc',
+			),
+		),
+		'render_callback' => 'cgb_render_einzelmaschinen_block',
+	));
+}
+add_action('init', 'cgb_register_einzelmaschinen_block');
