@@ -12,17 +12,19 @@
     gap: 1rem;
     .image img{
       width: 100%;
-        height: 300px;
+        height: 320px;
     }
 }
 .text , .image {
   flex: 50%;
 }
 
-.text h3 {
+.text h3, .text h4 {
   text-align: start;
   margin-bottom: 1rem;
-  font-family: "DDC Hardware"
+  font-family: "DDC Hardware";
+  font-size: 1.75rem;
+  
 } 
 
 @media (max-width: 768px){

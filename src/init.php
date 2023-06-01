@@ -225,6 +225,7 @@ function cgb_render_portfolio_block($attributes)
 		'post_type' => $postType,
 		'numberposts' => $postsToShow,
 		'order' => $order,
+		'suppress_filters' => false,
 	));
 
 	if (count($posts) === 0) {
@@ -238,7 +239,7 @@ function cgb_render_portfolio_block($attributes)
 	$title = get_the_title($first_post);
 
 	$output .= '<div class="first-post">';
-	$output .= '<a  href="' . $permalink . '">';
+	$output .= '<a  href="/automatisierte-fertigungsanlagen">';
 	$output .= '<img src="' . $thumbnail . '" alt="' . $title . '">';
 	$output .= '<p>' . $title . '</p>';
 	$output .= '</a>';
@@ -247,7 +248,7 @@ function cgb_render_portfolio_block($attributes)
 	$output .= '<div class="remaining-posts">'; // Start a new div for the remaining posts
 
 	foreach ($posts as $post) {
-		$permalink = '/einzelmaschinen//#' . sanitize_title(get_the_title($post));
+		$permalink = '/einzelmaschinen/#' . sanitize_title(get_the_title($post));
 		$thumbnail = get_the_post_thumbnail_url($post->ID);
 		$title = get_the_title($post);
 
@@ -374,7 +375,6 @@ function cgb_render_einzelmaschinen_block($attributes)
 	return $output;
 }
 
-// Teraz zarejestruj ten blok do użycia w edytorze Gutenberg
 function cgb_register_einzelmaschinen_block()
 {
 	register_block_type('cgb/einzelmaschinenblock', array(

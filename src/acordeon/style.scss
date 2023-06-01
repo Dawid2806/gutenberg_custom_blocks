@@ -13,11 +13,10 @@
 .accordion-content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-out; /* 0.5s to czas trwania animacji */
+  transition: max-height 0.3s ease-out; 
 }
   
 .accordion-content.open {
-  max-height: 500px; /* Musimy ustawić maksymalną wysokość, której spodziewamy się dla naszych akordeonów */
-}
+  max-height: fit-content;  }
 
   
